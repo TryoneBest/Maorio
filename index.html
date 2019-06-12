@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <script src="EaselJS/lib/easeljs.min.js"></script>
+        <script>
+            var stage;
+            /*var image = new Image()
+            image.src = "./image/player1.PNG"
+            //1671 390
+            image.onload = function(){
+                alert('width' + image.width + 'height' + image.height)
+            }*/
+            function init(){
+                stage = new createjs.Stage("game");
+                var player_data = {
+                    "images": ["./image/player1.png"],
+                    "frames": {"height": 390, "width": 332},
+                    "animations": {
+                        "stand": ["0"],
+                        "run": ["1", "2", "run", 1.5],
+                        "jump": ["3"],
+                        "dead": ["4"]
+                    }
+                }
+                var player_spritesheet = new createjs.SpriteSheet(player_data)
+                sprite = new createjs.Sprite(player_spritesheet, "run")
+                stage.addChild(sprite)
+                createjs.Ticker.addEventListener('tick', update);
+            }
+
+            function update(event){
+                stage.update();
+            }
+        </script>
+    </head>
+    <body onload="init();">
+        <canvas id="game" width="1000" height="700" style="background-color:white"></canvas>
+    </body>
+</html>
