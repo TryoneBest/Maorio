@@ -7,78 +7,41 @@
         <title>Document</title>
         <script src="EaselJS/lib/easeljs.min.js"></script>
         <script src="PreloadJS-1.0.0/lib/preloadjs.min.js"></script>
+        <script src="js/player.js"></script>
+        <script src="js/blocks.js"></script>
         <script>
-            var stage;
-            const ARROW_KEY_LEFT = 37 //left control on key board
-            const ARROW_KEY_RIGHT = 39 // right control
-            const SPACE_KEY = 32 //space control to jump
-            var leftkeyDown = false //if left key is put on
-            var rightkeyDown = false //if right key is put on
-            var jump_available = true //if play stand rightly, which means he can jump
-            var player_speed = 10
-            var isKeyDown = false
-            /*var image = new Image()
-            image.src = "./image/block1.PNG"
-            //1671 390 player
-            //256 32 block
-            image.onload = function(){
-                alert('width' + image.width + 'height' + image.height)
-            }*/
-            /*var player_data = {
-                "images": [queue.getResult("player")],
-                "frames": {"height": 390, "width": 332},
-                "animations": {
-                    "stand": ["0"],
-                    "run": ["1", "2", "run", 1.5],
-                    "jump": ["3"],
-                    "dead": ["4"]
-                }
-            }
-            var block_data = {
-                "images": [queue.getResult("block")],
-                "frames": {"height": 32, "width": 37},
-                "animations": {
-                    "fragile-block": ["0"],
-                    "unknown-block": ["1"],
-                    "known-block": ["2"],
-                    "iron-block": ["3"],
-                    "hard-block": ["4"],
-                }
-            }*/
+            var stage
+            var sWidth
+            var sHeight
             function init(){
                 stage = new createjs.Stage("game")
                 sWidth = stage.canvas.width
                 sHeight = stage.canvas.height
                 queue = new createjs.LoadQueue(true)
                 queue.loadManifest([
-                    {id: "block", src: "./image/block1.png"},
-                    {id: "player", src: "./image/player1.png"}
+                    {id: "block", src: "./image/block.png"},
+                    {id: "player", src: "./image/player.png"},
+                    {id: "backgroud1", src: "./image/backgroud1.png"}
                 ])
-                /*var player_spritesheet = new createjs.SpriteSheet(player_data)
-                run_player = new createjs.Sprite(player_spritesheet, "run")
-                run_player.scale = 0.15
-                stage.addChild(run_player)*/
-
-                /*
-                block spritesheet
-                var block_spritesheet = new createjs.SpriteSheet(block_data)
-                fragile_block = new createjs.Sprite(block_spritesheet, "fragile-block")
-                unknown_block = new createjs.Sprite(block_spritesheet, "unknown-block")
-                known_block = new createjs.Sprite(block_spritesheet, "known-block")
-                iron_block = new createjs.Sprite(block_spritesheet, "iron-block")
-                hard_block = new createjs.Sprite(block_spritesheet, "hard-block")
-                stage.addChild(fragile_block)
-                stage.addChild(unknown_block)
-                stage.addChild(known_block)
-                stage.addChild(iron_block)
-                stage.addChild(hard_block)
-                */
                 queue.on("complete", handleComplete)
-                //createjs.Ticker.addEventListener('tick', startGame);
             }
 
             function handleComplete() {
-                buildGame()
+                var player_img = queue.getResult('player')
+                    block_img = queue.getResult('block')
+                    backgroud1_img = queue.getResult('backgroud1')
+                //alert(backgroud1_img.width + '   ' + backgroud1_img.height)
+                //595 416
+                var backgroud1 = new createjs.Shape()
+                backgroud1.graphics.bf(backgroud1_img).drawRect(0, 0, sWidth, sHeight)
+                backgroud1.setTransform(0, 0, sWidth/backgroud1_img.width, sHeight/backgroud1_img.height)
+                stage.addChild(backgroud1)
+                //alert(block_img.width + '    ' + block_img.height)
+                //302 105
+                //createMap()
+                //buildGame()
+                createPlayer(100, 100, player_img)
+                createBlocks(200, 100, block_img)
                 setControl()
                 startGame()
             }
@@ -93,144 +56,6 @@
 
             }
 
-            function buildPlayer() {
-                var player_data = {
-                    "images": [queue.getResult("player")],
-                    "frames": {"height": 390, "width": 332},
-                    "animations": {
-                        "stand": ["0"],
-                        "run": ["1", "2", "run", 1.5],
-                        "jump": ["3"],
-                        "dead": ["4"]
-                    }
-                }
-                var player_spritesheet = new createjs.SpriteSheet(player_data)
-                stand_player = new createjs.Sprite(player_spritesheet, "stand")
-                stand_player.scale = 0.15
-                stand_player.x = sWidth / 2
-                stand_player.y = sHeight - stand_player.getBounds().height
-                stage.addChildAt(stand_player, 0)
-            }
-
-            function setControl() {
-                if(!isKeyDown) {
-                    console.log(!isKeyDown)
-                    window.onkeydown = handleKeyDown
-                } else {
-                    window.onkeydown = handleKeyPress
-                }
-                //window.onkeydown = handleKeyDown
-                //window.onkeypress = handleKeyPress
-                window.onkeyup = handleKeyUp
-            }
-
-            var stand_player_count = 0
-            function handleKeyDown(e) {
-                e = !e ? window.event : e
-                isKeyDown = true
-                setControl()
-                var player_data = {
-                    "images": [queue.getResult("player")],
-                    "frames": {"height": 390, "width": 332},
-                    "animations": {
-                        "stand": ["0"],
-                        "run": ["1", "2", "run", 1.5],
-                        "jump": ["3"],
-                        "dead": ["4"]
-                    }
-                }
-                var player_spritesheet = new createjs.SpriteSheet(player_data)
-                run_player = new createjs.Sprite(player_spritesheet, "run")
-                run_player.scale = 0.15
-                run_player.x = stand_player.x
-                run_player.y = stand_player.y
-                //run_player.addEventListener('animationend',function(event){
-                //                    stage.removeChild(event.target);
-                //                });
-                stand_player_count += 1
-                stage.removeChild(stand_player)
-                console.log("remove stand_player" + stand_player_count)
-                stage.addChild(run_player)
-                switch(e.keyCode) {
-                    case ARROW_KEY_LEFT:
-                        leftkeyDown = true
-                        break
-                    case ARROW_KEY_RIGHT:
-                        rightkeyDown = true
-                        break
-                }
-            }
-
-            function handleKeyPress(e) {
-                e = !e ? window.event : e
-                switch(e.keyCode) {
-                    case ARROW_KEY_LEFT:
-                        leftkeyDown = true
-                        break
-                    case ARROW_KEY_RIGHT:
-                        rightkeyDown = true
-                        break
-                }
-            }
-
-            var run_player_count = 0
-            function handleKeyUp(e) {
-                e = !e ? window.event : e
-                isKeyDown = false
-                setControl()
-                var player_data = {
-                    "images": [queue.getResult("player")],
-                    "frames": {"height": 390, "width": 332},
-                    "animations": {
-                        "stand": ["0"],
-                        "run": ["1", "2", "run", 1.5],
-                        "jump": ["3"],
-                        "dead": ["4"]
-                    }
-                }
-                var player_spritesheet = new createjs.SpriteSheet(player_data)
-                stand_player = new createjs.Sprite(player_spritesheet, "stand")
-                stand_player.scale = 0.15
-                stand_player.x = run_player.x
-                stand_player.y = run_player.y
-                stage.removeChild(run_player)
-                run_player_count += 1
-                console.log("remove run_player" + run_player_count)
-                stage.addChild(stand_player)
-                switch(e.keyCode) {
-                    case ARROW_KEY_LEFT:
-                        leftkeyDown = false
-                        break
-                    case ARROW_KEY_RIGHT:
-                        rightkeyDown = false
-                        break
-                    case SPACE_KEY:
-                        playerJump()
-                }
-            }
-
-            function playerJump() {
-                if(jump_available) {
-                    var player_data = {
-                        "images": [queue.getResult("player")],
-                        "frames": {"height": 390, "width": 332},
-                        "animations": {
-                            "stand": ["0"],
-                            "run": ["1", "2", "run", 1.5],
-                            "jump": ["3"],
-                            "dead": ["4"]
-                        }
-                    }
-                    var jumpSheet = new createjs.SpriteSheet(player_data)
-                    var jump_player = new createjs.Sprite(jumpSheet, "jump")
-                    jump_player.scale = 0.15
-                    jump_player.x = stand_player.x
-                    jump_player.y = stand_player.y
-                    stage.removeChild(stand_player)
-                    stage.addChild(jump_player)
-                }
-            }
-
             function startGame(event) {
                 createjs.Ticker.addEventListener('tick', function() {
                     updateGame()
@@ -242,37 +67,9 @@
             function updateGame() {
                 updatePlayer()
             }
-
-            function updatePlayer() {
-                try{
-                    var nextX = run_player.x
-                    if(leftkeyDown) {
-                        nextX = run_player.x - player_speed
-                        if(nextX < 0) {
-                            nextX = 0
-                        }
-                    }else if(rightkeyDown) {
-                        nextX = run_player.x + player_speed
-                    }
-                    run_player.x = nextX
-                    stand_player.x = nextX
-                }
-                catch(err) {
-                    var nextX = stand_player.x
-                    if(leftkeyDown) {
-                        nextX = stand_player.x - player_speed
-                        if(nextX < 0) {
-                            nextX = 0
-                        }
-                    }else if(rightkeyDown) {
-                        nextX = stand_player.x + player_speed
-                    }
-                    stand_player.x = nextX
-                }
-            }
         </script>
     </head>
     <body onload="init();">
-        <canvas id="game" width="1000" height="700" style="background-color:white"></canvas>
+        <canvas id="game" width="800" height="600" style="background-color:white"></canvas>
     </body>
 </html>
